@@ -31,3 +31,23 @@ def register(request):
         form1=forms.userform()
         form2=forms.studentform()
     return render(request,'register.html',context={'form1':form1,'form2':form2})
+
+def load_slots(request):
+    date=request.GET.get('date')
+    print(datetime.datetime.now())
+    slots=models.Slot.objects.filter(date=date,start_time__gte=datetime.datetime.now()).order_by('start_time')
+    return render(request,'student/dropdownlist.html',{'slots':slots})
+
+class AppointmentCreate(LoginRequiredMixin,CreateView):
+    login_url='login'
+    model=models.Appointment
+    form_class=forms.appointmentform
+    template_name="student/addappointment.html"
+    def get_success_url(self):
+        return reverse_lazy('index')
+    def form_valid(self,form):
+        self.object=form.save(commit=False)
+        self.object.patient=models.Student.objects.get(user=self.request.user)
+        self.object.doctor=models.Duty.objects.get(date=self.object.date).doc
+        self.object.save()
+        return super(AppointmentCreate,self).form_valid(form)
