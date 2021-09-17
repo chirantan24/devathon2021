@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+{% load static%}
+{% load crispy_forms_tags %}
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+</head>
+<body>
+            <form class="form-control" method="POST">
+						<div class="account-logo">
+                            <a href="{%url 'index'%}"><img src="{% static 'img/logo-dark.png'%}" alt=""></a>
+                        </div>
+                          {% csrf_token %}
+                          <div class="form-group">
+                            {{ form1|crispy }}
+                            {{ form2|crispy }}
+                          </div>
+                        <div class="form-group checkbox">
+                            <label>
+                                <input type="checkbox"> I have read and agree the Terms & Conditions
+                            </label>
+                        </div>
+                        <div class="form-group text-center">
+                            <button class="btn btn-primary account-btn" type="submit">Signup</button>
+                        </div>
+                        <div class="text-center login-link">
+                            Already have an account? <a href="{% url 'login'%}">Login</a>
+                        </div>
+                    </form>
+
+
+</body>
+
+
+
+</html>
