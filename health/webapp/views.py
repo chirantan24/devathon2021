@@ -51,3 +51,23 @@ class AppointmentCreate(LoginRequiredMixin,CreateView):
         self.object.doctor=models.Duty.objects.get(date=self.object.date).doc
         self.object.save()
         return super(AppointmentCreate,self).form_valid(form)
+
+class AppointmentList(LoginRequiredMixin,ListView):
+    login_url='login'
+    model=models.Appointment
+    template_name="appointments.html"
+    context_object_name='appointments'
+    def get_context_data(self,**kwargs):
+        context=super(AppointmentList,self).get_context_data(**kwargs)
+        age=[]
+        for i in context['appointments']:
+            age.append((int)(datetime.date.today().year - i.patient.birthdate.year + 1))
+        context['appointments']=zip(context['appointments'],age)
+        return context
+    def get_queryset(self,*args,**kwargs):
+        is_patient=models.Student.objects.all().filter(user=self.request.user).count()
+        is_doctor=models.Doctor.objects.all().filter(user=self.request.user).count()
+        if is_patient and not self.request.user.is_superuser:
+            raise Http404
+        elif is_doctor:
+            return models.Appointment.objects.all().filter(doctor=models.Doctor.objects.get(user=self.request.user),date=datetime.date.today())

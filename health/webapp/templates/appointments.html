@@ -1,0 +1,8 @@
+{% extends 'base.html'%}
+{% block b1%}
+{% load static %}
+
+{%for appointment,age in appointments%}
+<h2>{{appointment.patient.regno}}</h2> - <h3>{{age}}</h3>
+{% endfor %}
+{% endblock %}
