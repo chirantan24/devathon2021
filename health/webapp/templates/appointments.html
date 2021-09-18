@@ -1,8 +1,81 @@
 {% extends 'base.html'%}
 {% block b1%}
 {% load static %}
+<div class="container-fluid bg-info mt-5">
+                <div class="row">
+                    <div class="col-sm-4 col-3 mt-2 mb-3">
+                        <h4 class="page-title text-white mt-2 mb-3">Appointments</h4>
+                    </div>
+                    <div class="col-sm-8 col-9 text-right mb-3 mt-3">
+                        <a href="{% url 'app:request'%}" class="btn btn btn-warning btn-rounded float-right"><i class="fa fa-plus"></i> Add Appointment</a>
+                    </div>
 
-{%for appointment,age in appointments%}
-<h2>{{appointment.patient.regno}}</h2> - <h3>{{age}}</h3>
-{% endfor %}
+                    {% if role == 'R'%}
+                    <div class="input-group ml-3 mr-3 mb-3">
+                      <div class="input-group-prepend">
+                        <span class="input-group-text" id="inputGroup-sizing-default">Date</span>
+                      </div>
+                      <input type="date" class="form-control" id="Date" aria-label="Date" aria-describedby="inputGroup-sizing-default" data-appointments-url="{% url 'load_appointments_rec' %}">
+                    </div>
+                    {% elif role == 'D'%}
+                    <div class="input-group ml-3 mr-3 mb-3">
+                      <div class="input-group-prepend">
+                        <span class="input-group-text" id="inputGroup-sizing-default">Date</span>
+                      </div>
+                      <input type="date" class="form-control" id="Date" aria-label="Date" aria-describedby="inputGroup-sizing-default" data-appointments-url="{% url 'load_appointments_doc' %}">
+                    </div>
+                    {% else %}
+                    <div class="input-group ml-3 mr-3 mb-3">
+                      <div class="input-group-prepend">
+                        <span class="input-group-text" id="inputGroup-sizing-default">Date</span>
+                      </div>
+                      <input type="date" class="form-control" id="Date" aria-label="Date" aria-describedby="inputGroup-sizing-default" data-appointments-url="{% url 'load_appointments_student' %}">
+                    </div>
+                    {% endif %}
+
+                </div>
+				<div class="row">
+					<div class="col-md-12">
+						<div class="table-responsive">
+							<table class="table table-striped custom-table">
+								<thead>
+									<tr>
+										<th>Appointment ID</th>
+										<th>Patient Name</th>
+										<th>Age</th>
+										<th>Doctor Name</th>
+										<th>Date</th>
+										<th>Appointment Time</th>
+										<th>Status</th>
+                    <th>Details</th>
+										<th class="text-right">Action</th>
+									</tr>
+								</thead>
+								<tbody id="ROW">
+
+								</tbody>
+							</table>
+						</div>
+					</div>
+                </div>
+            </div>
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+      <script>
+        document.querySelector("#Date").oninput=function() {
+        var url = $(this).attr("data-appointments-url");
+        var date = $(this).val();
+        $.ajax({
+          url: url,
+          type: "get",
+          data:{
+            date:date,
+          },
+          success: function (data) {
+            $("#ROW").html(data);
+          }
+        });
+
+      };
+      </script>
+
 {% endblock %}

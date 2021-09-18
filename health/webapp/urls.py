@@ -3,5 +3,12 @@ from . import views
 app_name='app'
 urlpatterns=[
 path('request/',views.AppointmentCreate.as_view(),name='request'),
-path('appointments/',views.AppointmentList.as_view(),name='appointments'),
+path('appointments/',views.get_appointments,name='appointments'),
+path('record/<pk>/',views.record,name='record'),
+path('records',views.get_records,name='records'),
+path('createbio/',views.Create_bio,name='createbio'),
+path('updatebio/',views.update_bio,name='updatebio'),
+path('appointment/delete/<pk>',views.AppointmentDelete.as_view(),name='appointmentdelete'),
+path('appointment/update/<pk>',views.AppointmentUpdate.as_view(),name='appointmentupdate'),
+path('appointments/<pk>/',views.AppointmentDetail.as_view(),name='appointmentdetail'),
 ]

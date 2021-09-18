@@ -17,6 +17,8 @@ from django.utils.http import urlsafe_base64_encode
 from django.contrib.auth.tokens import default_token_generator
 from django.utils.encoding import force_bytes
 from django.contrib.auth.forms import PasswordResetForm
+from django.contrib.auth.decorators import login_required
+
 # Create your views here.
 def index(request) :
   return render(request,'index.html')
@@ -83,6 +85,9 @@ class AppointmentCreate(LoginRequiredMixin,CreateView):
         self.object.patient=models.Student.objects.get(user=self.request.user)
         self.object.doctor=models.Duty.objects.get(date=self.object.date).doc
         self.object.save()
+        subject="Appointment Scheduled on {}".format(self.object.date)
+        email="Hey {},\n Your Appointment to despensary NITW is scheduled on {}".format(self.request.user.first_name,self.object.date)
+        send_mail(subject,email,'barebears567@gmail.com',[self.request.user.email],fail_silently=False)
         return super(AppointmentCreate,self).form_valid(form)
 
 class AppointmentList(LoginRequiredMixin,ListView):
@@ -104,3 +109,144 @@ class AppointmentList(LoginRequiredMixin,ListView):
             raise Http404
         elif is_doctor:
             return models.Appointment.objects.all().filter(doctor=models.Doctor.objects.get(user=self.request.user),date=datetime.date.today())
+
+class AppointmentDelete(LoginRequiredMixin,DeleteView):
+    login_url='login'
+    model=models.Appointment
+    success_url=reverse_lazy('index')
+    template_name='appointment_confirm_delete.html'
+    def get_context_data(self,**kwargs):
+        context=super(AppointmentDelete,self).get_context_data(**kwargs)
+        is_rec=models.Receptionist.objects.all().filter(user=self.request.user).count()
+        if context['object'].patient==self.request.user.student or self.request.user.is_superuser or is_rec:
+            return context
+        else:
+            raise Http404
+
+class AppointmentDetail(LoginRequiredMixin,DetailView):
+    login_url='login'
+    model=models.Appointment
+    def get_context_data(self,**kwargs):
+        context=super(AppointmentDetail,self).get_context_data(**kwargs)
+        is_rec=models.Receptionist.objects.all().filter(user=self.request.user).count()
+        context['is_rec']=is_rec
+        if context['object'].patient==self.request.user.student or self.request.user.is_superuser or is_rec:
+            return context
+        else:
+            raise Http404
+
+class AppointmentUpdate(LoginRequiredMixin,UpdateView):
+    login_url='login'
+    model=models.Appointment
+    form_class=forms.appointmentform
+    template_name="student/addappointment.html"
+    def get_context_data(self,**kwargs):
+        context=super(AppointmentUpdate,self).get_context_data(**kwargs)
+        is_rec=models.Receptionist.objects.all().filter(user=self.request.user).count()
+        if context['object'].patient==self.request.user.student or self.request.user.is_superuser or is_rec:
+            return context
+        else:
+            raise Http404
+    def get_success_url(self):
+        return reverse_lazy('index')
+    def form_valid(self,form):
+        self.object=form.save(commit=False)
+        self.object.patient=models.Student.objects.get(user=self.request.user)
+        self.object.doctor=models.Duty.objects.get(date=self.object.date).doc
+        self.object.save()
+        subject="Appointment Scheduled on {}".format(self.object.date)
+        email="Hey {},\n Your Appointment to despensary NITW is updated and scheduled on {}".format(self.request.user.first_name,self.object.date)
+        send_mail(subject,email,'barebears567@gmail.com',[self.request.user.email],fail_silently=False)
+        return super(AppointmentCreate,self).form_valid(form)
+
+def record(request,pk):
+    is_rec=models.Receptionist.objects.all().filter(user=request.user).count()
+    if not is_rec and not request.user.is_superuser:
+        raise Http404
+    appointment=models.Appointment.objects.get(id=pk)
+    if request.method == "POST":
+        form=forms.recordform(data=request.POST)
+        obj=form.save(commit=False)
+        # create file1
+        rec=models.Record(title=obj.title,student=obj.student,file2=obj.file2,details=obj.details)
+    else :
+        form=forms.recordform(title="Appointment for " + appointment.title,student=appointment.patient,date=datetime.date.today())
+    return render(request,'receptionist/addrecord.html',context={"form":form})
+
+
+class Create_bio(LoginRequiredMixin,CreateView):
+    model=models.Bio
+    login_url='login'
+    template_name='student/bio_create.html'
+    success_url=reverse_lazy('index')
+    form_class=forms.BioForm
+    def form_valid(self,form):
+        self.object=form.save(commit=False)
+        self.object.user=self.request.user;
+        self.object.save()
+        return super(Create_bio,self).form_valid(form)
+class update_bio(LoginRequiredMixin,UpdateView):
+    model=models.Bio
+    login_url='login'
+    template_name='student/bio_create.html'
+    success_url=reverse_lazy('index')
+    form_class=forms.BioForm
+    def form_valid(self,form):
+        self.object=form.save(commit=False)
+        self.object.user=self.request.user;
+        self.object.save()
+        return super(update_bio,self).form_valid(form)
+
+def load_appointments_rec(request):
+    date=request.GET.get('date')
+    appointments=models.Appointment.objects.all().filter(date=date).order_by('slot')
+    age=[]
+    for i in appointments:
+        age.append((int)(datetime.date.today().year - i.patient.birthdate.year + 1))
+    appointments=zip(appointments,age)
+    return render(request,'student/table_rows.html',{'appointments':appointments})
+
+def load_appointments_doc(request):
+    date=request.GET.get('date')
+    duty=models.Duty.objects.all().filter(date=date,doc=request.user.doctor).count()
+    appointments=models.Appointment.objects.all().filter(date=date,doc=request.user.doctor).order_by('slot')
+    age=[]
+    for i in appointments:
+        age.append((int)(datetime.date.today().year - i.patient.birthdate.year + 1))
+    appointments=zip(appointments,age)
+    return render(request,'student/table_rows.html',{'appointments':appointments,'duty':duty})
+
+def load_appointments_student(request):
+    date=request.GET.get('date')
+    print(date)
+    appointments=models.Appointment.objects.all().filter(date=date,patient=request.user.student)
+    age=[]
+    for i in appointments:
+        print("hello")
+        age.append((int)(datetime.date.today().year - i.patient.birthdate.year + 1))
+    appointments=zip(appointments,age)
+    return render(request,'student/table_rows.html',{'appointments':appointments})
+@login_required
+def get_appointments(request):
+    is_rec=models.Receptionist.objects.all().filter(user=request.user).count()
+    is_doctor=models.Doctor.objects.all().filter(user=request.user).count()
+    is_superuser=request.user.is_superuser
+    if is_rec or is_superuser:
+        return render(request,'appointments.html',{'role':'R'})
+    elif is_doctor:
+        return render(request,'appointments.html',{'role':'D'})
+    else :
+        return render(request,'appointments.html',{'role':'S'})
+
+@login_required
+def get_records(request):
+    is_rec=models.Receptionist.objects.all().filter(user=request.user).count()
+    is_doctor=models.Doctor.objects.all().filter(user=request.user).count()
+    is_superuser=request.user.is_superuser
+    if is_rec or is_superuser or is_doctor:
+        records=models.Record.objects.all().order_by('-date')
+        return render(request,'records.html',{'records':records})
+    else :
+        records=models.Record.objects.filter(student=request.user.student).order_by('-date')
+        return render(request,'records.html',{'records':records})
+# TODO: Medicines inventory,staff notif , make pdf from data to upload, testing file uploads, front end

@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+{% block b1 %}
+{%load static%}
+<div class="container-fluid bg-info mt-5">
+                <div class="row">
+                    <div class="col-sm-4 col-3 mt-2 mb-3">
+                        <h4 class="page-title text-white mt-2 mb-3">Health Records</h4>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="table-responsive">
+                            <table class="table table-striped custom-table mb-0 datatable">
+                                <thead>
+                                    <tr>
+                                        <th>Reg no</th>
+                                        <th>Title</th>
+                                        <th>Date</th>
+                                        <th>File1</th>
+                                        <th>File2</th>
+                                        <th>Details</th>
+                                        <th class="text-right">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                  {% for record in records%}
+                                    <tr class="text-white">
+                                      <td>{{record.student.regno}}</td>
+                                        <td>
+                                            <strong>{{record.title}}</strong>
+                                        </td>
+                                        <td>{{record.date}}</td>
+                                        <td>
+                                          {% if record.file1 %}
+                                          <a href="{{ record.file1.url }}" download class="btn btn-warning flex-last" type="submit"><i class="fas fa-download"></i> Downlaod</a>
+                                          {% else %}
+                                          NA
+                                          {% endif%}
+                                        </td>
+                                        <td>
+                                          {% if record.file2 %}
+                                          <a href="{{ record.file2.url }}" download class="btn btn-warning flex-last" type="submit"><i class="fas fa-download"></i> Downlaod</a>
+                                          {% else %}
+                                          NA
+                                          {% endif%}
+                                        </td>
+                                        <td class="text-left">
+                                          <p><button class="btn btn-outline-light" type="button" data-toggle="collapse" data-target=#{{record.id}} aria-expanded="false" aria-controls="collapseExample">
+                                            Details</button></p>
+<div class="collapse" id={{record.id}}>
+  <div class="card card-body text-dark">
+    {{record.details}}
+  </div>
+</div>
+                                        </td>
+                                        <td class="text-right">
+<div class="btn-group">
+  <button type="button" class="btn btn-light dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+    Action
+  </button>
+  <div class="dropdown-menu">
+    <a class="dropdown-item" href="#">Details</a>
+    <a class="dropdown-item" href="#">Another action</a>
+  </div>
+</div>
+                                        </td>
+                                    </tr>
+                                    {% endfor%}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+      		</div>
+{% endblock%}

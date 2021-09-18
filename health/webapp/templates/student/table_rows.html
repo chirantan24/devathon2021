@@ -1,0 +1,32 @@
+{% load static %}
+{% for i,j in appointments%}
+<tr id="ROW" class="text-white">
+  <td>{{i.id}}</td>
+  <td><img width="28" height="28" src="{% static 'img/user.jpg'%}" class="rounded-circle m-r-5" alt="">{{i.patient.user.first_name}}</td>
+  <td>{{j}}</td>
+  <td>{{i.doctor.user.first_name}}</td>
+  <td>{{i.date}}</td>
+  <td>{{i.slot.start_time}} : {{i.slot.end_time}}</td>
+  <td><span class="custom-badge status-red">Not done</span></td>
+  <td class="text-left">
+    <p><button class="btn btn-outline-light" type="button" data-toggle="collapse" data-target=#{{i.id}} aria-expanded="false" aria-controls="collapseExample">
+      Details</button></p>
+<div class="collapse" id={{i.id}}>
+<div class="card card-body text-dark">
+{{i.description}}
+</div>
+</div>
+  </td>
+  <td class="text-right">
+    <div class="btn-group">
+      <button type="button" class="btn btn-light dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        Action
+      </button>
+      <div class="dropdown-menu">
+        <a class="dropdown-item" href="{% url 'app:appointmentupdate' pk=i.id %}">Update</a>
+        <a class="dropdown-item" href="{% url 'app:appointmentdelete' pk=i.id %}">Delete</a>
+      </div>
+    </div>
+  </td>
+</tr>
+{% endfor%}
