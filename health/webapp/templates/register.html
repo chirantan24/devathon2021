@@ -13,29 +13,32 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
 
 </head>
-<body>
-
-    <form class="" method="POST">
-      <div class="text-center">
-          <a href="{% url 'index'%}"><img class="align-self-center mr-3" src="{%static 'img/logo-dark.png'%}" alt="" height="100"></a>
-        </div>{% csrf_token %}
-                  <div class="form-group">
-                    {{ form1|crispy }}
-                    {{ form2|crispy }}
-                  </div>
-                <div class="form-group checkbox">
-                    <label>
-                        <input type="checkbox"> I have read and agree the Terms & Conditions
-                    </label>
+<body class="bg-info">
+<div class="container">
+  <form class="" method="POST">
+    <div class="text-center">
+        <a href="{% url 'index'%}"><img class="align-self-center mr-3" src="{%static 'img/logo-dark.png'%}" alt="" height="100"></a>
+        <h2 class="text-white">Medicare</h2>
+      </div>{% csrf_token %}
+                <div class="form-group text-white">
+                  {{ form1|crispy }}
+                  {{ form2|crispy }}
                 </div>
-                <div class="form-group text-center">
-                    <button class="btn btn-primary account-btn" type="submit">Signup</button>
-                </div>
-                <div class="text-center login-link">
-                    Already have an account? <a href="{% url 'login'%}">Login</a>
-                </div>
+              <div class="form-group checkbox">
+                  <label>
+                      <input type="checkbox"> I have read and agree the Terms & Conditions
+                  </label>
               </div>
-            </form>
+              <div class="form-group text-center">
+                  <button class="btn btn-success btn-lg" type="submit">Signup</button>
+              </div>
+              <div class="text-center login-link">
+              <h2>Already have an account? <a href="{% url 'login'%}" class="text-light">Login</a></h2>
+              </div>
+            </div>
+          </form>
+
+</div>
 
 </body>
 </html>

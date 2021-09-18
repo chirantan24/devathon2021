@@ -126,11 +126,12 @@ class AppointmentDelete(LoginRequiredMixin,DeleteView):
 class AppointmentDetail(LoginRequiredMixin,DetailView):
     login_url='login'
     model=models.Appointment
+    template_name="receptionist/appointment_detail.html"
     def get_context_data(self,**kwargs):
         context=super(AppointmentDetail,self).get_context_data(**kwargs)
         is_rec=models.Receptionist.objects.all().filter(user=self.request.user).count()
-        context['is_rec']=is_rec
-        if context['object'].patient==self.request.user.student or self.request.user.is_superuser or is_rec:
+        context['is_rec']=is_rec or self.request.user.is_superuser
+        if  self.request.user.is_superuser or is_reccontext['object'].patient==self.request.user.student :
             return context
         else:
             raise Http404
@@ -182,7 +183,7 @@ class Create_bio(LoginRequiredMixin,CreateView):
     form_class=forms.BioForm
     def form_valid(self,form):
         self.object=form.save(commit=False)
-        self.object.user=self.request.user;
+        self.object.user=self.request.user
         self.object.save()
         return super(Create_bio,self).form_valid(form)
 class update_bio(LoginRequiredMixin,UpdateView):
@@ -196,7 +197,12 @@ class update_bio(LoginRequiredMixin,UpdateView):
         self.object.user=self.request.user;
         self.object.save()
         return super(update_bio,self).form_valid(form)
-
+    def get_context_data(self,**kwargs):
+        context=super(update_bio,self).get_context_data(**kwargs)
+        if context['object'].student==self.request.user.student or self.request.user.is_superuser:
+            return context
+        else:
+            raise Http404
 def load_appointments_rec(request):
     date=request.GET.get('date')
     appointments=models.Appointment.objects.all().filter(date=date).order_by('slot')
