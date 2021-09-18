@@ -64,3 +64,16 @@ class BioForm(forms.ModelForm):
         'blood_group':'Blood Group',
         'profile_pic':'Upload Profile pic'
         }
+
+class RecordForm(forms.ModelForm):
+    weight = forms.IntegerField()
+    class Meta:
+        model=models.Record
+        fields = ('title','date','weight','file2','details')
+        widgets={
+        'details':forms.Textarea(attrs={"cols":40,"rows":5,"placeholder":'Enter Details here.'}),
+        }
+    def __init__(self,*args,**kwargs):
+        super(RecordForm,self).__init__(*args,**kwargs)
+        self.fields['title'].widget.attrs['readonly']=True
+        self.fields['date'].widget.attrs['readonly']=True

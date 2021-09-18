@@ -15,7 +15,7 @@
   </div>
   <div class="row">
       <div class="col-lg-8 offset-lg-2">
-        <form class="" method="POST" id="form1" data-slots-url="{% url 'load_slots'%}">
+        <form class="" method="POST" enctype="multipart/form-data">
             <div class="form-group text-white">
               {% csrf_token%}
                 {{form|crispy}}

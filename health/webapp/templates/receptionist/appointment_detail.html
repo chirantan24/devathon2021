@@ -16,7 +16,7 @@
                 <li class="list-group-item list-group-item-action list-group-item-light"><h2>Slot : {{appointment.slot.start_time}} : {{appointment.slot.end_time}}</h2></li>
                 <li class="list-group-item list-group-item-action list-group-item-light"><h2>Description :
                     <div class="container border border-dark rounded mt-3 mb-3">
-                      {{appointment.description}}
+                      <p class="mt-2">{{appointment.description}}</p>
                     </div>
                   </h2></li>
                 </ul>
@@ -27,7 +27,7 @@
                       <a href="{% url 'app:appointmentupdate' pk=appointment.id%}" class="btn btn btn-lg btn-warning btn-rounded float-right mr-5"> Update</a>
                   </div>
                   <div class="col-sm-2 col-2 float-center mb-3 mt-3">
-                      <a href="{% url 'app:request'%}" class="btn btn btn-success btn-lg btn-rounded float-center mr-0"> Completed</a>
+                      <a href="{% url 'app:record' pk=appointment.id%}" class="btn btn btn-success btn-lg btn-rounded float-center mr-0"> Completed</a>
                   </div>
                   <div class="col-sm-4 col-4 float-left mb-3 mt-3">
                       <a href="{% url 'app:appointmentdelete' pk=appointment.id%}" class="btn btn btn-lg btn-danger btn-rounded float-left ml-4"> Cancel</a>
