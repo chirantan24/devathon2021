@@ -1,4 +1,4 @@
 <option value="">---------</option>
 {% for slot in slots %}
-<option value="{{ slot.id }}">{{ slot.start_time }} - {{slot.end_time}}</option>
+<option value="{{ slot.id }}">{{ slot.start_time }} - {{slot.end_time}} remaining: {{slot.remaining}}</option>
 {% endfor %}

@@ -6,6 +6,11 @@
                     <div class="col-sm-4 col-3 mt-2 mb-3">
                         <h1 class="page-title text-white mt-2 mb-3">Health Records</h1>
                     </div>
+                    {% if is_student %}
+                    <div class="col-sm-8 col-9 text-right mb-3 mt-3">
+                        <a href="{% url 'app:createrecord'%}" class="btn btn btn-warning btn-rounded float-right"><i class="fa fa-plus"></i> Add Record</a>
+                    </div>
+                    {% endif %}
                 </div>
                 <div class="row">
                     <div class="col-md-12">
@@ -59,8 +64,8 @@
     Action
   </button>
   <div class="dropdown-menu">
-    <a class="dropdown-item" href="#">Details</a>
-    <a class="dropdown-item" href="#">Another action</a>
+    <a class="dropdown-item" href="{% url 'app:updaterecord' pk=record.id%}">Update</a>
+    <a class="dropdown-item" href="{% url 'app:deleterecord' pk=record.id%}">Delete</a>
   </div>
 </div>
                                         </td>

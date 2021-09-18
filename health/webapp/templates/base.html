@@ -8,10 +8,11 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
     <meta charset="utf-8">
+    <link rel="stylesheet" href="{% static 'css/style.css'%}">
     <title></title>
   </head>
   <body class="bg-info">
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <nav class="navbar navbar-expand-lg navbar-light bg-light" >
       <span><img class="align-self-center mr-3" src="{%static 'img/logo-dark.png'%}" alt="" height="40"></span>
   <a class="navbar-brand" href="{% url 'index'%}">Medicare</a>
   <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarTogglerDemo02" aria-controls="navbarTogglerDemo02" aria-expanded="false" aria-label="Toggle navigation">
@@ -21,7 +22,7 @@
   <div class="collapse navbar-collapse" id="navbarTogglerDemo02">
     <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
       <li class="nav-item active">
-        <a class="nav-link" href="{% url 'index'%}">Home <span class="sr-only">(current)</span></a>
+        <a class="nav-link" href="{% url 'index'%}">Home </a>
       </li>
 
       {% if user.is_authenticated%}
@@ -31,17 +32,6 @@
       <li class="nav-item">
         <a class="nav-link" href="{% url 'app:records' %}">Records</a>
       </li>
-      {% if user.student %}
-      {% if user.student.bio %}
-      <li class="nav-item">
-        <a class="nav-link" href="{% url 'app:bio' pk=user.student.id %}">Records</a>
-      </li>
-      {% else %}
-      <li class="nav-item">
-        <a class="nav-link" href="{% url 'app:createbio'%}">Bio</a>
-      </li>
-      {% endif %}
-      {% endif %}
       <li class="nav-item">
               <a class="nav-link" href="{%url 'logout'%}">Logout</a>
             </li>
@@ -52,10 +42,25 @@
             </li>
               {% endif%}
     </ul>
-    <form class="form-inline my-2 my-lg-0">
-      <input class="form-control mr-sm-2" type="search" placeholder="Search">
-      <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
-    </form>
+    <span class="navbar-text">
+      <div class="circle green mr-2">
+      </div>
+    </span>
+    <span class="font-weight-bold">
+
+      {% if user.student %}
+      {% if user.student.bio %}
+        <a href="{% url 'app:profile' pk=user.student.bio.id %}">
+        {{user.username}}
+        </a>
+      {% else %}
+        <a  href="{% url 'app:createbio'%}">
+        {{user.username}}</a>
+      {% endif %}
+      {% else %}
+      {{user.username}}
+      {% endif %}
+    </span>
   </div>
 </nav>
     <div class="container text-white">

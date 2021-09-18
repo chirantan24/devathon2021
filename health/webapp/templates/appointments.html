@@ -6,10 +6,6 @@
                     <div class="col-sm-4 col-3 mt-2 mb-3">
                         <h1 class="page-title text-white mt-2 mb-3">Appointments</h1>
                     </div>
-                    <div class="col-sm-8 col-9 text-right mb-3 mt-3">
-                        <a href="{% url 'app:request'%}" class="btn btn btn-warning btn-rounded float-right"><i class="fa fa-plus"></i> Add Appointment</a>
-                    </div>
-
                     {% if role == 'R'%}
                     <div class="input-group ml-3 mr-3 mb-3">
                       <div class="input-group-prepend">
@@ -25,6 +21,9 @@
                       <input type="date" class="form-control" id="Date" aria-label="Date" aria-describedby="inputGroup-sizing-default" data-appointments-url="{% url 'load_appointments_doc' %}">
                     </div>
                     {% else %}
+                    <div class="col-sm-8 col-9 text-right mb-3 mt-3">
+                        <a href="{% url 'app:request'%}" class="btn btn btn-warning btn-rounded float-right"><i class="fa fa-plus"></i> Add Appointment</a>
+                    </div>
                     <div class="input-group ml-3 mr-3 mb-3">
                       <div class="input-group-prepend">
                         <span class="input-group-text" id="inputGroup-sizing-default">Date</span>

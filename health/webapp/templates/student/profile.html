@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% block b1 %}
+{%load static%}
+<div class="content-section">
+      <div class="media">
+        <img class="rounded-circle" src="{{ bio.profile_pic.url  }}" height="200">
+        <div class="media-body">
+          <h2 class="text-light mt-5 ml-4">{{ bio.student.user.username }}</h2>
+          <p class="text-secondary ml-4">{{ bio.student.user.email }}</p>
+        </div>
+        <a href="{% url 'app:updatebio' pk=bio.id%}" class="btn btn-warning btn-lg mt-5 mr-5 float-left">Update</a>
+
+      </div>
+      <ul class="list-group">
+      <li class="list-group-item list-group-item-action list-group-item-light"><h2>
+         First Name: {{bio.student.user.first_name}}</h2></li>
+      <li class="list-group-item list-group-item-action list-group-item-light"> <h2>Last Name : {{bio.student.user.last_name}}</h2></li>
+      <li class="list-group-item list-group-item-action list-group-item-light"> <h2>Birth Date : {{bio.student.birthdate}}</h2></li>
+      <li class="list-group-item list-group-item-action list-group-item-light"><h2>Contact : {{bio.student.contact}} </h2></li>
+      <li class="list-group-item list-group-item-action list-group-item-light"><h2>Address :
+          <div class="container border border-dark rounded mt-3 mb-3">
+            <p class="mt-2">{{bio.Address}}</p>
+          </div>
+        </h2></li>
+        <li class="list-group-item list-group-item-action list-group-item-light"><h2>Blood Group : {{bio.blood_group}}</h2></li>
+        <li class="list-group-item list-group-item-action list-group-item-light"><h2>Remarks : {{bio.Remarks}} </h2></li>
+
+        </ul>
+{% endblock %}

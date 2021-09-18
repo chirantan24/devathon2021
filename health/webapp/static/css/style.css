@@ -1,0 +1,24 @@
+.circle {
+  width: 20px;
+  height: 20px;
+  line-height: 20px;
+  border-radius: 50%; /* the magic */
+  -moz-border-radius: 50%;
+  -webkit-border-radius: 50%;
+  text-align: center;
+  color: white;
+  font-size: 16px;
+  text-transform: uppercase;
+  font-weight: 700;
+  margin: 0;
+}
+
+.blue {
+  background-color: #3498db;
+}
+.green {
+  background-color: #3fd471;
+}
+.red {
+  background-color: #e74c3c;
+}

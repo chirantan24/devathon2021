@@ -28,6 +28,7 @@ class Slot(models.Model):
     date=models.DateField()
     start_time=models.TimeField()
     end_time=models.TimeField()
+    remaining=models.PositiveIntegerField(default=0)
     def __str__(self):
         return self.start_time.strftime("%H:%M") + "-" + self.end_time.strftime("%H:%M")
 
@@ -72,7 +73,7 @@ blood_groups={
 ("AB-",'AB-')
 }
 class Bio(models.Model):
-    student=models.OneToOneField(Student,on_delete=models.CASCADE,null=True)
+    student=models.OneToOneField(Student,related_name='bio',on_delete=models.CASCADE,null=True)
     blood_group=models.CharField(choices=blood_groups,default="A+",max_length=4)
     PWD=models.BooleanField()
     Remarks=models.CharField(max_length=250)

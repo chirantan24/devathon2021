@@ -70,7 +70,11 @@ def password_reset_request(request):
 def load_slots(request):
     date=request.GET.get('date')
     print(datetime.datetime.now())
-    slots=models.Slot.objects.filter(date=date,start_time__gte=datetime.datetime.now()).order_by('start_time')
+    if date == datetime.date.today():
+        slots=models.Slot.objects.filter(date=date,start_time__gte=datetime.datetime.now(),remaining__gte=1).order_by('start_time')
+    else :
+        slots=models.Slot.objects.filter(date=date,remaining__gte=1).order_by('start_time')
+
     return render(request,'student/dropdownlist.html',{'slots':slots})
 
 class AppointmentCreate(LoginRequiredMixin,CreateView):
@@ -84,6 +88,9 @@ class AppointmentCreate(LoginRequiredMixin,CreateView):
         self.object=form.save(commit=False)
         self.object.patient=models.Student.objects.get(user=self.request.user)
         self.object.doctor=models.Duty.objects.get(date=self.object.date).doc
+        slot=models.Slot.objects.get(id=self.object.slot.id)
+        slot.remaining-=1
+        slot.save()
         self.object.save()
         subject="Appointment Scheduled on {}".format(self.object.date)
         email="Hey {},\n Your Appointment to despensary NITW is scheduled on {}".format(self.request.user.first_name,self.object.date)
@@ -134,7 +141,7 @@ class AppointmentDetail(LoginRequiredMixin,DetailView):
         context=super(AppointmentDetail,self).get_context_data(**kwargs)
         is_rec=models.Receptionist.objects.all().filter(user=self.request.user).count()
         context['is_rec']=is_rec or self.request.user.is_superuser
-        if  self.request.user.is_superuser or is_reccontext['object'].patient==self.request.user.student :
+        if  self.request.user.is_superuser or is_rec or context['object'].patient==self.request.user.student :
             return context
         else:
             raise Http404
@@ -200,7 +207,16 @@ def record(request,pk):
         form=forms.RecordForm(instance=temp)
     return render(request,'receptionist/addrecord.html',context={"form":form})
 
-
+class profile(LoginRequiredMixin,DetailView):
+    model=models.Bio
+    login_url='login'
+    template_name='student/profile.html'
+    def get_context_data(self,**kwargs):
+        context=super(profile,self).get_context_data(**kwargs)
+        if self.request.user.is_superuser or context['object'].student==self.request.user.student:
+            return context
+        else:
+            raise Http404
 class Create_bio(LoginRequiredMixin,CreateView):
     model=models.Bio
     login_url='login'
@@ -209,7 +225,7 @@ class Create_bio(LoginRequiredMixin,CreateView):
     form_class=forms.BioForm
     def form_valid(self,form):
         self.object=form.save(commit=False)
-        self.object.user=self.request.user
+        self.object.student=self.request.user.student
         self.object.save()
         return super(Create_bio,self).form_valid(form)
 class update_bio(LoginRequiredMixin,UpdateView):
@@ -220,12 +236,12 @@ class update_bio(LoginRequiredMixin,UpdateView):
     form_class=forms.BioForm
     def form_valid(self,form):
         self.object=form.save(commit=False)
-        self.object.user=self.request.user;
+        self.object.student=self.request.user.student
         self.object.save()
         return super(update_bio,self).form_valid(form)
     def get_context_data(self,**kwargs):
         context=super(update_bio,self).get_context_data(**kwargs)
-        if context['object'].student==self.request.user.student or self.request.user.is_superuser:
+        if self.request.user.is_superuser or context['object'].student==self.request.user.student:
             return context
         else:
             raise Http404
@@ -277,8 +293,55 @@ def get_records(request):
     is_superuser=request.user.is_superuser
     if is_rec or is_superuser or is_doctor:
         records=models.Record.objects.all().order_by('-date')
-        return render(request,'records.html',{'records':records})
+        return render(request,'records.html',{'records':records,'is_student':False})
     else :
         records=models.Record.objects.filter(student=request.user.student).order_by('-date')
-        return render(request,'records.html',{'records':records})
+        return render(request,'records.html',{'records':records,'is_student':True})
 # TODO: Medicines inventory,staff notif , make pdf from data to upload, testing file uploads, front end
+
+class CreateRecord(LoginRequiredMixin,CreateView):
+    login_url='login'
+    model=models.Record
+    form_class=forms.RecordForm2
+    template_name="student/addrecord.html"
+    def get_success_url(self):
+        return reverse_lazy('index')
+    def form_valid(self,form):
+        self.object=form.save(commit=False)
+        self.object.student=models.Student.objects.get(user=self.request.user)
+        self.object.save()
+        return super(CreateRecord,self).form_valid(form)
+
+class UpdateRecord(LoginRequiredMixin,UpdateView):
+    login_url='login'
+    model=models.Record
+    form_class=forms.RecordForm2
+    template_name="student/addrecord.html"
+    def get_success_url(self):
+        return reverse_lazy('index')
+    def form_valid(self,form):
+        self.object=form.save(commit=False)
+        self.object.student=models.Student.objects.get(user=self.request.user)
+        self.object.save()
+        return super(UpdateRecord,self).form_valid(form)
+    def get_context_data(self,**kwargs):
+        context=super(UpdateRecord,self).get_context_data(**kwargs)
+        is_rec=models.Receptionist.objects.all().filter(user=self.request.user).count()
+        if  self.request.user.is_superuser or is_rec or context['object'].student==self.request.user.student:
+            return context
+        else:
+            raise Http404
+
+class DeleteRecord(LoginRequiredMixin,DeleteView):
+    login_url='login'
+    model=models.Record
+    template_name='record_confirm_delete.html'
+    def get_context_data(self,**kwargs):
+        context=super(DeleteRecord,self).get_context_data(**kwargs)
+        is_rec=models.Receptionist.objects.all().filter(user=self.request.user).count()
+        if  self.request.user.is_superuser or is_rec or context['object'].student==self.request.user.student:
+            return context
+        else:
+            raise Http404
+    def get_success_url(self):
+        return reverse_lazy('index')

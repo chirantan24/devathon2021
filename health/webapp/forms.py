@@ -48,7 +48,11 @@ class appointmentform(forms.ModelForm):
             try:
                 date = self.data.get('date')
                 print("date")
-                self.fields['slot'].queryset = models.Slot.objects.filter(date=date,start_time__gte=datetime.datetime.now()).order_by('start_time')
+                if date == datetime.date.today():
+                    self.fields['slot'].queryset = models.Slot.objects.filter(date=date,start_time__gte=datetime.datetime.now(),remaining__gte=1).order_by('start_time')
+                else :
+                    self.fields['slot'].queryset = models.Slot.objects.filter(date=date,remaining__gte=1).order_by('start_time')
+
             except (ValueError, TypeError):
                 print("OH NO!!")
 class BioForm(forms.ModelForm):
@@ -77,3 +81,11 @@ class RecordForm(forms.ModelForm):
         super(RecordForm,self).__init__(*args,**kwargs)
         self.fields['title'].widget.attrs['readonly']=True
         self.fields['date'].widget.attrs['readonly']=True
+class RecordForm2(forms.ModelForm):
+    weight = forms.IntegerField()
+    class Meta:
+        model=models.Record
+        fields = ('title','date','weight','file2','details')
+        widgets={
+        'details':forms.Textarea(attrs={"cols":40,"rows":5,"placeholder":'Enter Details here.'}),
+        }
