@@ -26,6 +26,7 @@ urlpatterns = [
     path('login/',auth_view.LoginView.as_view(template_name='login.html'),name='login'),
     path('logout/',auth_view.LogoutView.as_view(),name='logout'),
     path('load_slots/',views.load_slots,name='load_slots'),
+    path('load_records/',views.load_records,name='load_records'),
     path('load_appointments_doc/',views.load_appointments_doc,name='load_appointments_doc'),
     path('load_appointments_rec/',views.load_appointments_rec,name='load_appointments_rec'),
     path('load_appointments_student/',views.load_appointments_student,name='load_appointments_student'),

@@ -6,7 +6,19 @@
                     <div class="col-sm-4 col-3 mt-2 mb-3">
                         <h1 class="page-title text-white mt-2 mb-3">Health Records</h1>
                     </div>
-                    {% if is_student %}
+                    {% if role == 'R'%}
+                    <div class="input-group ml-3 mr-3 mb-3">
+                      <div class="input-group-prepend">
+                        <span class="input-group-text" id="inputGroup-sizing-default">Regno</span>
+                      </div>
+                      <select class="form-control" id="REG" aria-label="Reg NO" aria-describedby="inputGroup-sizing-default" data-records-url="{% url 'load_records' %}">
+                        <option value="">---------</option>
+                        {% for i in reg %}
+                        <option value="{{ i }}">{{i}}</option>
+                        {% endfor %}
+                        </select>
+                    </div>
+                    {% else %}
                     <div class="col-sm-8 col-9 text-right mb-3 mt-3">
                         <a href="{% url 'app:createrecord'%}" class="btn btn btn-warning btn-rounded float-right"><i class="fa fa-plus"></i> Add Record</a>
                     </div>
@@ -27,7 +39,7 @@
                                         <th class="text-right">Actions</th>
                                     </tr>
                                 </thead>
-                                <tbody>
+                                <tbody id="ROW2">
                                   {% for record in records%}
                                     <tr class="text-white">
                                       <td>{{record.student.regno}}</td>
@@ -77,5 +89,22 @@
                     </div>
                 </div>
             </div>
-      		</div>
+            <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+              <script>
+                document.querySelector("#REG").oninput=function() {
+                var url = $(this).attr("data-records-url");
+                var reg = $(this).val();
+                $.ajax({
+                  url: url,
+                  type: "get",
+                  data:{
+                    reg:reg,
+                  },
+                  success: function (data) {
+                    $("#ROW2").html(data);
+                  }
+                });
+
+              };
+              </script>
 {% endblock%}

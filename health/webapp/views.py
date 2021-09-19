@@ -286,6 +286,13 @@ def get_appointments(request):
     else :
         return render(request,'appointments.html',{'role':'S'})
 
+def load_records(request):
+    reg=request.GET.get('reg')
+    print(reg)
+
+    student=models.Student.objects.get(regno=reg)
+    records=models.Record.objects.all().filter(student=student)
+    return render(request,'table_rows.html',{'records':records})
 @login_required
 def get_records(request):
     is_rec=models.Receptionist.objects.all().filter(user=request.user).count()
@@ -293,10 +300,14 @@ def get_records(request):
     is_superuser=request.user.is_superuser
     if is_rec or is_superuser or is_doctor:
         records=models.Record.objects.all().order_by('-date')
-        return render(request,'records.html',{'records':records,'is_student':False})
+        students=models.Student.objects.all()
+        reg=[]
+        for i in students:
+            reg.append(i.regno)
+        return render(request,'records.html',{'records':records,'role':'R','reg':reg})
     else :
         records=models.Record.objects.filter(student=request.user.student).order_by('-date')
-        return render(request,'records.html',{'records':records,'is_student':True})
+        return render(request,'records.html',{'records':records,'role':'S'})
 # TODO: Medicines inventory,staff notif , make pdf from data to upload, testing file uploads, front end
 
 class CreateRecord(LoginRequiredMixin,CreateView):
